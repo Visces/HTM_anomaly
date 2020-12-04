@@ -4,7 +4,7 @@ import datetime
 import os
 
 sign = np.load("./signs/sign.npy")
-anomaly_logscore = np.genfromtxt('anom_logscore_teste_2.txt', delimiter=',')
+anomaly_logscore = np.genfromtxt('anom_logscore_teste_1(class)_ver2_.txt', delimiter=',')
 
 
 

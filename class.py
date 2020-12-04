@@ -16,16 +16,18 @@ import pandas as pd
 import os
 import time
 
-def tratar_dados(dados,a = 7000000, b =7005000 ):
+def tratar_dados(dados, a = 7000000, b =7005000 ):
 
     """
     retorna o tempo, scalar e o N_DATA
     """
 
     date = sign[a:b,0]
+    print(np.size(date))
 
     scalar = sign[a:b,1]
     scalar = [float(i) for i in scalar]
+    print(np.size(scalar))
 
     teste = np.column_stack((date,scalar))
 
@@ -174,8 +176,9 @@ def definir_AnomDetect(N_DATA):
 
     return anomaly_score, anomaly_likelihood, anom_score_txt, anom_logscore_txt
 
-def run(save=True,date, scalar, scalar_encoder, time_encoder,bits_time, bits_scalar, sp, tm, N_COLUMNS, anom_score_txt, anom_logscore_txt,learn_SP = True, learn_TM = True, str1='', str2=''):
+def run(date, scalar, scalar_encoder, time_encoder,bits_time, bits_scalar, sp, tm, N_COLUMNS, anom_score_txt, anom_logscore_txt,str_1='', str_2='',learn_SP = True, learn_TM = True,save=True):
 
+    print(np.size(date),np.size(scalar))
     dados = np.column_stack((date,scalar))
     
     for i,linha in enumerate(dados):
@@ -203,25 +206,32 @@ def run(save=True,date, scalar, scalar_encoder, time_encoder,bits_time, bits_sca
 
         anom_logscore_txt[i] = anomaly_likelihood.computeLogLikelihood(anom_score_txt[i])
 
+        if learn_SP == False:
+            print(i)
+
         if i%100==0:
 
             print(i)
     
     if save == True:
         
-        a='anom_score_teste_1(class)_' + str1 + '_.txt'
+        a= 'anom_score_teste_1(class)_' + str_1 + '_.txt'
 
-        b = 'anom_logscore_teste_1(class)_' + str2 + '_.txt'
+        b = 'anom_logscore_teste_1(class)_' + str_2 + '_.txt'
 
         np.savetxt(a,anom_score_txt,delimiter=',')
 
-        np.savetxt('anom_logscore_teste_1(class).txt',anom_logscore_txt,delimiter=',')
+        np.savetxt(b,anom_logscore_txt,delimiter=',')
+    
+    else:
+
+        print('\n will not save!! \n')
         
 
 def plot(date, scalar): 
     
 
-    anom_score = np.genfromtxt('anom_score_teste_1(class).txt',delimiter=',')
+    anom_score = np.genfromtxt( 'anom_score_teste_1(class).txt' ,delimiter=',')
     anomaly_logscore = np.genfromtxt('anom_logscore_teste_1(class).txt', delimiter=',')
 
     x_axis = np.arange(0,N_DATA)
@@ -234,31 +244,32 @@ def plot(date, scalar):
     axs[2].plot(date[:], anomaly_logscore[:-1])
 
     plt.show()
-    
-
-
-
-
-
 
 
 if __name__ == '__main__':
     
-    #N_COLUMNS = 2048
+    N_COLUMNS = 2048
 
     sign = np.load("./signs/sign.npy") ##abrindo os sinais
 
     date, scalar, N_DATA = tratar_dados(sign)
 
-    SIZE_ENCODER_, scalar_encoder, time_encoder, bits_time, bits_scalar = definir_encoders()
+    #SIZE_ENCODER_, scalar_encoder, time_encoder, bits_time, bits_scalar = definir_encoders()
 
-    sp = definir_SP(SIZE_ENCODER_)
+    #sp = definir_SP(SIZE_ENCODER_)
 
-    tm = definir_TM(N_COLUMNS)
+    #tm = definir_TM(N_COLUMNS)
     
-    anomaly_score, anomaly_likelihood, anom_score_txt, anom_logscore_txt = definir_AnomDetect(N_DATA)
+    #anomaly_score, anomaly_likelihood, anom_score_txt, anom_logscore_txt = definir_AnomDetect(N_DATA)
 
-    run(date,scalar,scalar_encoder,time_encoder,bits_time, bits_scalar,sp,tm,N_COLUMNS, anom_score_txt, anom_logscore_txt,True,True)
+    #run(date,scalar,scalar_encoder,time_encoder,bits_time, bits_scalar,sp,tm,N_COLUMNS, anom_score_txt, anom_logscore_txt,'ver1','ver1',True,True,True)
+    
+    #date, scalar, N_DATA = tratar_dados(sign,a = 7220000, b = 7225000)
+
+    print(date)
+    print(scalar)
+
+    run(date,scalar,scalar_encoder,time_encoder,bits_time, bits_scalar,sp,tm,N_COLUMNS, anom_score_txt, anom_logscore_txt,'ver2','ver2',False,False,True)
     
 
     plot(date,scalar)
