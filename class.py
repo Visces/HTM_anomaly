@@ -16,7 +16,7 @@ import pandas as pd
 import os
 import time
 
-def tratar_dados(dados, a = 7000000, b =7005000 ):
+def tratar_dados(dados, a = 7000000, b =7001000 ):
 
     """
     retorna o tempo, scalar e o N_DATA
@@ -183,6 +183,8 @@ def run(date, scalar, scalar_encoder, time_encoder,bits_time, bits_scalar, sp, t
     
     for i,linha in enumerate(dados):
 
+        
+
         #####################################################
 
         scalar_encoder.encodeIntoArray(linha[1], bits_scalar)
@@ -206,12 +208,13 @@ def run(date, scalar, scalar_encoder, time_encoder,bits_time, bits_scalar, sp, t
 
         anom_logscore_txt[i] = anomaly_likelihood.computeLogLikelihood(anom_score_txt[i])
 
-        if learn_SP == False:
-            print(i)
-
         if i%100==0:
 
             print(i)
+            print('\n')
+            print(linha)
+            print('\n')
+            print(encoder_output)
     
     if save == True:
         
@@ -222,6 +225,8 @@ def run(date, scalar, scalar_encoder, time_encoder,bits_time, bits_scalar, sp, t
         np.savetxt(a,anom_score_txt,delimiter=',')
 
         np.savetxt(b,anom_logscore_txt,delimiter=',')
+
+        print('\n\n\n fim do primeiro run \n\n\n')
     
     else:
 
@@ -231,8 +236,8 @@ def run(date, scalar, scalar_encoder, time_encoder,bits_time, bits_scalar, sp, t
 def plot(date, scalar): 
     
 
-    anom_score = np.genfromtxt( 'anom_score_teste_1(class).txt' ,delimiter=',')
-    anomaly_logscore = np.genfromtxt('anom_logscore_teste_1(class).txt', delimiter=',')
+    anom_score = np.genfromtxt( 'anom_score_teste_1(class)_.txt' ,delimiter=',')
+    anomaly_logscore = np.genfromtxt('anom_logscore_teste_1(class)_.txt', delimiter=',')
 
     x_axis = np.arange(0,N_DATA)
 
@@ -254,20 +259,18 @@ if __name__ == '__main__':
 
     date, scalar, N_DATA = tratar_dados(sign)
 
-    #SIZE_ENCODER_, scalar_encoder, time_encoder, bits_time, bits_scalar = definir_encoders()
+    SIZE_ENCODER_, scalar_encoder, time_encoder, bits_time, bits_scalar = definir_encoders()
 
-    #sp = definir_SP(SIZE_ENCODER_)
+    sp = definir_SP(SIZE_ENCODER_)
 
-    #tm = definir_TM(N_COLUMNS)
+    tm = definir_TM(N_COLUMNS)
     
-    #anomaly_score, anomaly_likelihood, anom_score_txt, anom_logscore_txt = definir_AnomDetect(N_DATA)
+    anomaly_score, anomaly_likelihood, anom_score_txt, anom_logscore_txt = definir_AnomDetect(N_DATA)
 
-    #run(date,scalar,scalar_encoder,time_encoder,bits_time, bits_scalar,sp,tm,N_COLUMNS, anom_score_txt, anom_logscore_txt,'ver1','ver1',True,True,True)
+    run(date,scalar,scalar_encoder,time_encoder,bits_time, bits_scalar,sp,tm,N_COLUMNS, anom_score_txt, anom_logscore_txt,'ver1','ver1',True,True,True)
     
-    #date, scalar, N_DATA = tratar_dados(sign,a = 7220000, b = 7225000)
+    date, scalar, N_DATA = tratar_dados(sign,a = 7220000, b = 7221000)
 
-    print(date)
-    print(scalar)
 
     run(date,scalar,scalar_encoder,time_encoder,bits_time, bits_scalar,sp,tm,N_COLUMNS, anom_score_txt, anom_logscore_txt,'ver2','ver2',False,False,True)
     
