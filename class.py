@@ -23,6 +23,8 @@ def tratar_dados(dados, a = 7000000, b =7001000 ):
     """
 
     date = sign[a:b,0]
+    if b>7001600:
+       sign[7001500:7001600,1] = [2000 for i in sign[7001500:7001600,1]]
     print(np.size(date))
 
     scalar = sign[a:b,1]
@@ -41,10 +43,12 @@ def definir_encoders():
     retorna o SIZE_ENCODER_, scalar_encoder, time_encoder, bits_time, bits_scalar
     """  
     
-    scalar_encoder = RandomDistributedScalarEncoder(resolution = 0.03)
+    scalar_encoder = RandomDistributedScalarEncoder(resolution = 2.30,
+                                                    seed = 42,
+                                                    )
 
     #two inputs separated by less than the 'resolution' will have the same encoder output.
-    time_encoder = RandomDistributedScalarEncoder(resolution = 0.001)
+    time_encoder = RandomDistributedScalarEncoder(resolution = 0.03)
 
     #7 = how much bits represent one input
     #0.25 = radius = if an input ir greater than the radius in comparisson with anoter ..
@@ -73,7 +77,7 @@ def definir_SP(SIZE_ENCODER_):
         potentialRadius = SIZE_ENCODER_, # i set the potential radius of each mini-column as the whole ...
         #input space
             
-        potentialPct = 0.85, # how many bits on the input space that should have some permanence with each mini-column
+        potentialPct = 0.8, # how many bits on the input space that should have some permanence with each mini-column
         ## attention: having a permanence value doesn't mean that it will be connected, to be connected the "connection...
         ## force" / permanence needs to be higher than the threshold.
             
@@ -86,13 +90,13 @@ def definir_SP(SIZE_ENCODER_):
         ##First = because the simulusTHreshold will be already set as the sum of permanences of the 40th column...@@NEED TO CHECK
         ##any other mini-column with less than it won't be active on this input 
             
-        synPermInactiveDec = 0.008, #if a column is active, the off (that aren't 1 in input) bits which it is connected ...
+        synPermInactiveDec = 0.0005, #if a column is active, the off (that aren't 1 in input) bits which it is connected ...
         # will have a decrement on the "synapse force"/permance @@
             
-        synPermActiveInc = 0.08,#if a column is active, the on (that are 1 in input) bits which it is connected ...
+        synPermActiveInc = 0.003,#if a column is active, the on (that are 1 in input) bits which it is connected ...
         # will have a increment on the "synapse force"/permance @@
             
-        synPermConnected = 0.1, #how much the "strength" of the connection between the on bit and the mini-column ...
+        synPermConnected = 0.2, #how much the "strength" of the connection between the on bit and the mini-column ...
         #needs to be for they to be connected. @@
 
         # @@ what needs to be checked is if the bits with synPermConnected < 0.1 will decrement ou increment when a column ...
@@ -120,7 +124,7 @@ def definir_TM(N_COLUMNS):
     tm= TemporalMemory(
     columnDimensions= (N_COLUMNS,), # number of columns - it must be the same number of SP's columns
 
-    cellsPerColumn= 15, # num of cells per colums - this parameter dicatates how many different cotexts TM ...
+    cellsPerColumn= 32, # num of cells per colums - this parameter dicatates how many different cotexts TM ...
     # could learn, so it's really importante to not select really lower numbers as 2 or 1, and higher numbers ...
     #than 40 can be useless, because the number of cells gets REALLY HIGH (40^2048 in this case)
 
@@ -134,7 +138,7 @@ def definir_TM(N_COLUMNS):
     
     connectedPermanence= 0.5, # two cells will only be connected if the synapse permanence is higher than 0.5
 
-    minThreshold= 13, # A segment will only be active/connected if there are more than 10 sucessefull connected synapses within..
+    minThreshold= 10, # A segment will only be active/connected if there are more than 10 sucessefull connected synapses within..
     #it.
 
     maxNewSynapseCount= 20, # How many synapses can be added to a segment during learning
@@ -148,13 +152,13 @@ def definir_TM(N_COLUMNS):
     #On each active segment, there will be permanence increase of every active synapse, decrease on every inactive synapse and ...
     #creation of new synapses to cells that were active in previous state
 
-    predictedSegmentDecrement= 0.0004, #punishment for SEGMENTS for incorrect predictions
+    predictedSegmentDecrement= 0.0005, #punishment for SEGMENTS for incorrect predictions
     #from nupic documentation: predictedSegmentDecrement: A good value is just a bit larger than (the column-level sparsity * permanenceIncrement)...
     #So, if column-level sparsity is 2% and permanenceIncrement is 0.01, this parameter should be something like 4% * 0.01 = 0.0004).
 
     seed = 1960, 
-    maxSegmentPerCell= 255, 
-    maxSynapsesPerSegment= 255
+    maxSegmentPerCell= 32, 
+    maxSynapsesPerSegment= 128
     )
     return tm
 
@@ -168,11 +172,11 @@ def definir_AnomDetect(N_DATA):
     anom_logscore_txt = np.zeros((N_DATA+1,))
 
     anomaly_score = Anomaly(
-            slidingWindowSize = 25)
+            slidingWindowSize = 10)
 
     anomaly_likelihood = AnomalyLikelihood(
             learningPeriod=500,
-            historicWindowSize = 213)
+            historicWindowSize = 8640)
 
     return anomaly_score, anomaly_likelihood, anom_score_txt, anom_logscore_txt
 
@@ -257,7 +261,7 @@ if __name__ == '__main__':
 
     sign = np.load("./signs/sign.npy") ##abrindo os sinais
 
-    date, scalar, N_DATA = tratar_dados(sign)
+    date, scalar, N_DATA = tratar_dados(sign,a=7000000,b=7002000)
 
     SIZE_ENCODER_, scalar_encoder, time_encoder, bits_time, bits_scalar = definir_encoders()
 
@@ -269,13 +273,11 @@ if __name__ == '__main__':
 
     run(date,scalar,scalar_encoder,time_encoder,bits_time, bits_scalar,sp,tm,N_COLUMNS, anom_score_txt, anom_logscore_txt,'ver1','ver1',True,True,True)
     
-    date, scalar, N_DATA = tratar_dados(sign,a = 7220000, b = 7221000)
+    #date1, scalar1, N_DATA1 = tratar_dados(sign,a = 7220000, b = 7221000)
 
-
-    run(date,scalar,scalar_encoder,time_encoder,bits_time, bits_scalar,sp,tm,N_COLUMNS, anom_score_txt, anom_logscore_txt,'ver2','ver2',False,False,True)
+    #run(date1,scalar1,scalar_encoder,time_encoder,bits_time, bits_scalar,sp,tm,N_COLUMNS, anom_score_txt, anom_logscore_txt,'ver2','ver2',False,False,True)
     
-
-    plot(date,scalar)
+    #plot(date,scalar)
 
 
 
