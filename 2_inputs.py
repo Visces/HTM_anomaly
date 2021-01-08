@@ -15,6 +15,8 @@ import numpy as np
 import pandas as pd
 import os
 import time
+
+
 ##obs:
 #date virou scalar_1
 #scalar virou scalar_2
@@ -29,32 +31,39 @@ def tratar_dados(dados, a = 7000000, b =7001000 ):
     """
 
     scalar_1 = sign[a:b,1]
-    #if b>7001600:
-    #   sign[7001500:7001600,2] = [2000 for i in sign[7001500:7001600,2]]
+    if b>7001700: ## apenas testando a TM ao inserir erros
+
+        sign[7001500:7001700,2] = [3000 for i in sign[7001500:7001700,2]]
+        sign[7001500:7001700,2] = [3000 for i in sign[7001500:7001700,1]]
+
+
+
 
     scalar_2 = sign[a:b,2]
     scalar_2 = [float(i) for i in scalar_2]
-    print(np.size(scalar_2))
+    
 
-    teste = np.column_stack((scalar_1,scalar_2))
+    auxiliar_ = np.column_stack((scalar_1,scalar_2))
 
-    N_DATA, trash = np.shape(teste)
+    N_DATA, trash = np.shape(auxiliar_)
     
     return scalar_1, scalar_2, N_DATA
 
 def definir_encoders():
     
     """ 
-    retorna o SIZE_ENCODER_, scalar_encoder, time_encoder, bits_time, bits_scalar
+    retorna o SIZE_ENCODER_, scalar_2_encoder, scalar_1_encoder, bits_scalar_1, bits_scalar_2
     """  
+    ###  A RESOLUCAO DOS 3 TINHA QUE SER 2.30 # TROCAR DEPOIS
     
-    scalar_2_encoder = RandomDistributedScalarEncoder(resolution = 2.30,
+    scalar_1_encoder = RandomDistributedScalarEncoder(resolution = 2.3,
                                                     seed = 42,
                                                     )
 
     #two inputs separated by less than the 'resolution' will have the same encoder output.
-    scalar_1_encoder = RandomDistributedScalarEncoder(resolution = 2.30,
+    scalar_2_encoder = RandomDistributedScalarEncoder(resolution = 2.3,
                                                     seed = 42)
+
 
     #7 = how much bits represent one input
     #0.25 = radius = if an input ir greater than the radius in comparisson with anoter ..
@@ -178,12 +187,9 @@ def definir_AnomDetect(N_DATA):
     anom_score_txt = np.zeros((N_DATA+1,))
     anom_logscore_txt = np.zeros((N_DATA+1,))
 
-    anomaly_score = Anomaly(
-            slidingWindowSize = 10)
+    anomaly_score = Anomaly(slidingWindowSize=25)
 
-    anomaly_likelihood = AnomalyLikelihood(
-            learningPeriod=500,
-            historicWindowSize = 8640)
+    anomaly_likelihood = AnomalyLikelihood(learningPeriod=600, historicWindowSize=313)
 
     return anomaly_score, anomaly_likelihood, anom_score_txt, anom_logscore_txt
 
@@ -198,10 +204,14 @@ def run(scalar_1, scalar_2, scalar_2_encoder, scalar_1_encoder,bits_scalar_1, bi
 
         #####################################################
 
+        scalar_1_encoder.encodeIntoArray(linha[0], bits_scalar_1)
         scalar_2_encoder.encodeIntoArray(linha[1], bits_scalar_2)
-        scalar_1_encoder.encodeIntoArray(linha[0],bits_scalar_1)
+
+
 
         encoder_output = np.concatenate((bits_scalar_1, bits_scalar_2))
+
+        print(encoder_output)
 
         ####################################################
 
@@ -229,9 +239,9 @@ def run(scalar_1, scalar_2, scalar_2_encoder, scalar_1_encoder,bits_scalar_1, bi
     
     if save == True:
         
-        a= 'anom_score_teste_1(class)_' + str_1 + '_.txt'
+        a= 'anomaly_of_2_inputs/anom_score_teste_1(class)_' + str_1 + '_.txt'
 
-        b = 'anom_logscore_teste_1(class)_' + str_2 + '_.txt'
+        b = 'anomaly_of_2_inputs/anom_logscore_teste_1(class)_' + str_2 + '_.txt'
 
         np.savetxt(a,anom_score_txt,delimiter=',')
 
@@ -247,12 +257,12 @@ def run(scalar_1, scalar_2, scalar_2_encoder, scalar_1_encoder,bits_scalar_1, bi
 def plot(date, scalar): 
     
 
-    anom_score = np.genfromtxt( 'anom_score_teste_1(class)_.txt' ,delimiter=',')
-    anomaly_logscore = np.genfromtxt('anom_logscore_teste_1(class)_.txt', delimiter=',')
+    anom_score = np.genfromtxt( 'anomaly_of_2_inputs/anom_score_teste_1(class)_.txt' ,delimiter=',')
+    anomaly_logscore = np.genfromtxt('anomaly_of_2_inputs/anom_logscore_teste_1(class)_.txt', delimiter=',')
 
     x_axis = np.arange(0,N_DATA)
 
-    fig, axs = plt.subplots(3)
+    fig, axs = plt.subplots(2)
     fig.suptitle('os trem la')
 
     axs[0].plot(date[:],scalar[:])
@@ -268,7 +278,7 @@ if __name__ == '__main__':
 
     sign = np.load("./signs/sign.npy") ##abrindo os sinais
 
-    scalar_1, scalar_2, N_DATA = tratar_dados(sign,a=7000000,b=7022000)
+    scalar_1, scalar_2, N_DATA = tratar_dados(sign,a=7000000,b=7003000)
 
     SIZE_ENCODER_, scalar_2_encoder, scalar_1_encoder, bits_scalar_1, bits_scalar_2 = definir_encoders()
 
@@ -278,7 +288,7 @@ if __name__ == '__main__':
     
     anomaly_score, anomaly_likelihood, anom_score_txt, anom_logscore_txt = definir_AnomDetect(N_DATA)
 
-    run(scalar_1,scalar_2,scalar_2_encoder,scalar_1_encoder,bits_scalar_1, bits_scalar_2,sp,tm,N_COLUMNS, anom_score_txt, anom_logscore_txt,'ver1','ver1',True,True,True)
+    run(scalar_1, scalar_2, scalar_2_encoder, scalar_1_encoder, bits_scalar_1, bits_scalar_2,sp,tm,N_COLUMNS, anom_score_txt, anom_logscore_txt,'ver1','ver1',True,True,True)
     
     #date1, scalar1, N_DATA1 = tratar_dados(sign,a = 7220000, b = 7221000)
 
