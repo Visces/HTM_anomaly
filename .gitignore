@@ -1,8 +1,5 @@
 signs
 .vscode
-anomaly_of_3_inputs
-anomaly_of_2_inputs
-anom_logscore_teste_1(class)_ver1_.txt
-anom_logscore_teste_1(class)_ver2_.txt
-anom_score_teste_1(class)_ver1_.txt
-anom_score_teste_1(class)_ver2_.txt
+__pycache__
+scores
+anomalies

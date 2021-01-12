@@ -31,10 +31,11 @@ def tratar_dados(dados, a = 7000000, b =7001000 ):
     """
 
     scalar_1 = sign[a:b,1]
+    
     if b>7001700: ## apenas testando a TM ao inserir erros
 
-        sign[7001500:7001700,2] = [3000 for i in sign[7001500:7001700,2]]
-        sign[7001500:7001700,2] = [3000 for i in sign[7001500:7001700,1]]
+        sign[7001500:7001550,2] = [3000 for i in sign[7001500:7001550,2]]
+        sign[7001500:7001550,1] = [-275 for i in sign[7001500:7001550,1]]
 
 
 
@@ -42,6 +43,7 @@ def tratar_dados(dados, a = 7000000, b =7001000 ):
     scalar_2 = sign[a:b,2]
     scalar_2 = [float(i) for i in scalar_2]
     
+    print(scalar_2[1501])
 
     auxiliar_ = np.column_stack((scalar_1,scalar_2))
 
@@ -56,13 +58,13 @@ def definir_encoders():
     """  
     ###  A RESOLUCAO DOS 3 TINHA QUE SER 2.30 # TROCAR DEPOIS
     
-    scalar_1_encoder = RandomDistributedScalarEncoder(resolution = 2.3,
+    scalar_1_encoder = RandomDistributedScalarEncoder(resolution = 15.384615384615385,
                                                     seed = 42,
                                                     )
 
     #two inputs separated by less than the 'resolution' will have the same encoder output.
-    scalar_2_encoder = RandomDistributedScalarEncoder(resolution = 2.3,
-                                                    seed = 42)
+    scalar_2_encoder = RandomDistributedScalarEncoder(resolution = 15.384615384615385,
+                                                    seed = 23)
 
 
     #7 = how much bits represent one input
@@ -173,8 +175,8 @@ def definir_TM(N_COLUMNS):
     #So, if column-level sparsity is 2% and permanenceIncrement is 0.01, this parameter should be something like 4% * 0.01 = 0.0004).
 
     seed = 1960, 
-    maxSegmentPerCell= 32, 
-    maxSynapsesPerSegment= 128
+    maxSegmentPerCell= 128, 
+    maxSynapsesPerSegment= 32
     )
     return tm
 
@@ -239,9 +241,9 @@ def run(scalar_1, scalar_2, scalar_2_encoder, scalar_1_encoder,bits_scalar_1, bi
     
     if save == True:
         
-        a= 'anomaly_of_2_inputs/anom_score_teste_1(class)_' + str_1 + '_.txt'
+        a= 'anomalies/2_anom_score' + str_1 + '_.txt'
 
-        b = 'anomaly_of_2_inputs/anom_logscore_teste_1(class)_' + str_2 + '_.txt'
+        b = 'anomalies/2_anom_logscore' + str_2 + '_.txt'
 
         np.savetxt(a,anom_score_txt,delimiter=',')
 
@@ -288,7 +290,7 @@ if __name__ == '__main__':
     
     anomaly_score, anomaly_likelihood, anom_score_txt, anom_logscore_txt = definir_AnomDetect(N_DATA)
 
-    run(scalar_1, scalar_2, scalar_2_encoder, scalar_1_encoder, bits_scalar_1, bits_scalar_2,sp,tm,N_COLUMNS, anom_score_txt, anom_logscore_txt,'ver1','ver1',True,True,True)
+    run(scalar_1, scalar_2, scalar_2_encoder, scalar_1_encoder, bits_scalar_1, bits_scalar_2,sp,tm,N_COLUMNS, anom_score_txt, anom_logscore_txt,'','',True,True,True)
     
     #date1, scalar1, N_DATA1 = tratar_dados(sign,a = 7220000, b = 7221000)
 

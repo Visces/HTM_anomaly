@@ -19,13 +19,13 @@ import os
 import time
 
 t = getScalarMetricWithTimeOfDayAnomalyParams(  metricData = [0],
-                                                minVal = -150,
-                                                maxVal = 150,
+                                                minVal = -1000,
+                                                maxVal = 1000,
                                                 tmImplementation = "cpp"    )
 
 
 
-pp = pprint.PrettyPrinter(indent = 4)
+pp = pprint.PrettyPrinter(indent = 1)
 pp.pprint(t)
 
 
