@@ -47,7 +47,7 @@ def definir_encoders():
     """  
     ###  A RESOLUCAO DOS 3 TINHA QUE SER 2.30 # TROCAR DEPOIS
     
-    scalar_1_encoder = RandomDistributedScalarEncoder(resolution = 5.0,
+    scalar_1_encoder = RandomDistributedScalarEncoder(resolution = 1.5384615384615385,
                                                     seed = 42,
                                                     )
 
@@ -209,9 +209,10 @@ def run(scalar_1,scalar_1_encoder, bits_scalar_1, sp, tm, N_COLUMNS, anom_score_
 
         anom_score_txt[i] = anomaly_score.compute(tm.getActiveCells(), tm.getPredictiveCells())
 
-        anom_logscore_txt[i] = anomaly_likelihood.computeLogLikelihood(anom_score_txt[i])
-
         anom_probability_txt[i] = anomaly_likelihood.anomalyProbability(linha,anom_score_txt[i])
+
+        anom_logscore_txt[i] = anomaly_likelihood.computeLogLikelihood(anom_probability_txt[i])
+
 
         if i%100==0:
 
