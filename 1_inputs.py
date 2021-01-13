@@ -47,7 +47,7 @@ def definir_encoders():
     """  
     ###  A RESOLUCAO DOS 3 TINHA QUE SER 2.30 # TROCAR DEPOIS
     
-    scalar_1_encoder = RandomDistributedScalarEncoder(resolution = 1.5384615384615385,
+    scalar_1_encoder = RandomDistributedScalarEncoder(resolution = 5.0,
                                                     seed = 42,
                                                     )
 
@@ -171,14 +171,16 @@ def definir_AnomDetect(N_DATA):
 
     anom_score_txt = np.zeros((N_DATA+1,))
     anom_logscore_txt = np.zeros((N_DATA+1,))
+    anom_probability_txt = np.zeros((N_DATA+1,))
 
     anomaly_score = Anomaly(slidingWindowSize=25)
 
     anomaly_likelihood = AnomalyLikelihood(learningPeriod=600, historicWindowSize=313)
 
-    return anomaly_score, anomaly_likelihood, anom_score_txt, anom_logscore_txt
 
-def run(scalar_1,scalar_1_encoder, bits_scalar_1, sp, tm, N_COLUMNS, anom_score_txt, anom_logscore_txt,str_1='', str_2='',learn_SP = True, learn_TM = True,save=True):
+    return anomaly_score, anomaly_likelihood, anom_score_txt, anom_logscore_txt, anom_probability_txt
+
+def run(scalar_1,scalar_1_encoder, bits_scalar_1, sp, tm, N_COLUMNS, anom_score_txt, anom_logscore_txt,anom_probability_txt,str_1='', str_2='',learn_SP = True, learn_TM = True,save=True):
 
 
     dados = scalar_1
@@ -209,6 +211,8 @@ def run(scalar_1,scalar_1_encoder, bits_scalar_1, sp, tm, N_COLUMNS, anom_score_
 
         anom_logscore_txt[i] = anomaly_likelihood.computeLogLikelihood(anom_score_txt[i])
 
+        anom_probability_txt[i] = anomaly_likelihood.anomalyProbability(linha,anom_score_txt[i])
+
         if i%100==0:
 
             print(i)
@@ -216,6 +220,9 @@ def run(scalar_1,scalar_1_encoder, bits_scalar_1, sp, tm, N_COLUMNS, anom_score_
             print(linha)
             print('\n')
             print(encoder_output)
+        
+        if i==1520:
+            print(anom_probability_txt[i])
     
     if save == True:
         
@@ -223,9 +230,14 @@ def run(scalar_1,scalar_1_encoder, bits_scalar_1, sp, tm, N_COLUMNS, anom_score_
 
         b = 'anomalies/1_anom_logscore' + str_2 + '_.txt'
 
+        c = 'anomalies/1_anom_probscore' + str_2 + '_.txt'
+
+
         np.savetxt(a,anom_score_txt,delimiter=',')
 
         np.savetxt(b,anom_logscore_txt,delimiter=',')
+
+        np.savetxt(c,anom_probability_txt,delimiter=',')
 
         print('\n\n\n fim do primeiro run \n\n\n')
     
@@ -266,9 +278,9 @@ if __name__ == '__main__':
 
     tm = definir_TM(N_COLUMNS)
     
-    anomaly_score, anomaly_likelihood, anom_score_txt, anom_logscore_txt = definir_AnomDetect(N_DATA)
+    anomaly_score, anomaly_likelihood, anom_score_txt, anom_logscore_txt, anom_probability_txt = definir_AnomDetect(N_DATA)
 
-    run(scalar_1, scalar_1_encoder, bits_scalar_1,sp,tm,N_COLUMNS, anom_score_txt, anom_logscore_txt,'','',True,True,True)
+    run(scalar_1, scalar_1_encoder, bits_scalar_1,sp,tm,N_COLUMNS, anom_score_txt, anom_logscore_txt,anom_probability_txt,'','',True,True,True)
     
     #date1, scalar1, N_DATA1 = tratar_dados(sign,a = 7220000, b = 7221000)
 
