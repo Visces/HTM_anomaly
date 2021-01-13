@@ -27,58 +27,41 @@ import time
 def tratar_dados(dados, a = 7000000, b =7001000 ):
 
     """
-    retorna o scalar_1, scalar_2 e o N_DATA
+    retorna o scalar_1 e o N_DATA
     """
 
-    scalar_1 = sign[a:b,1]
-    
+    ############################ ERRO ARTIFICIAL #########################################
     if b>7001700: ## apenas testando a TM ao inserir erros
 
-        sign[7001500:7001550,2] = [3000 for i in sign[7001500:7001550,2]]
-        sign[7001500:7001550,1] = [-275 for i in sign[7001500:7001550,1]]
-
-
-
-
-    scalar_2 = sign[a:b,2]
-    scalar_2 = [float(i) for i in scalar_2]
+        sign[7001500:7001550,1] = [250 for i in sign[7001500:7001550,1]]
+    #######################################################################################
+    scalar_1 = sign[a:b,1]
+    N_DATA = np.size(scalar_1)
     
-    print(scalar_2[1501])
-
-    auxiliar_ = np.column_stack((scalar_1,scalar_2))
-
-    N_DATA, trash = np.shape(auxiliar_)
-    
-    return scalar_1, scalar_2, N_DATA
+    return scalar_1, N_DATA
 
 def definir_encoders():
     
     """ 
-    retorna o SIZE_ENCODER_, scalar_2_encoder, scalar_1_encoder, bits_scalar_1, bits_scalar_2
+    retorna o SIZE_ENCODER_, scalar_1_encoder, bits_scalar_1
     """  
     ###  A RESOLUCAO DOS 3 TINHA QUE SER 2.30 # TROCAR DEPOIS
     
-    scalar_1_encoder = RandomDistributedScalarEncoder(resolution = 15.384615384615385,
+    scalar_1_encoder = RandomDistributedScalarEncoder(resolution = 1.5384615384615385,
                                                     seed = 42,
                                                     )
 
     #two inputs separated by less than the 'resolution' will have the same encoder output.
-    scalar_2_encoder = RandomDistributedScalarEncoder(resolution = 15.384615384615385,
-                                                    seed = 23)
-
-
+   
     #7 = how much bits represent one input
     #0.25 = radius = if an input ir greater than the radius in comparisson with anoter ..
     #they won't overlapp 
 
     bits_scalar_1 = np.zeros(scalar_1_encoder.getWidth())
-    bits_scalar_2 = np.zeros(scalar_2_encoder.getWidth())
 
+    SIZE_ENCODER_ = np.size(bits_scalar_1)
 
-
-    SIZE_ENCODER_ = np.size(bits_scalar_1) + np.size(bits_scalar_2)
-
-    return SIZE_ENCODER_, scalar_2_encoder, scalar_1_encoder, bits_scalar_1, bits_scalar_2
+    return SIZE_ENCODER_, scalar_1_encoder, bits_scalar_1
 
 def definir_SP(SIZE_ENCODER_):
 
@@ -195,10 +178,10 @@ def definir_AnomDetect(N_DATA):
 
     return anomaly_score, anomaly_likelihood, anom_score_txt, anom_logscore_txt
 
-def run(scalar_1, scalar_2, scalar_2_encoder, scalar_1_encoder,bits_scalar_1, bits_scalar_2, sp, tm, N_COLUMNS, anom_score_txt, anom_logscore_txt,str_1='', str_2='',learn_SP = True, learn_TM = True,save=True):
+def run(scalar_1,scalar_1_encoder, bits_scalar_1, sp, tm, N_COLUMNS, anom_score_txt, anom_logscore_txt,str_1='', str_2='',learn_SP = True, learn_TM = True,save=True):
 
-    print(np.size(scalar_1),np.size(scalar_2))
-    dados = np.column_stack((scalar_1,scalar_2))
+
+    dados = scalar_1
     
     for i,linha in enumerate(dados):
 
@@ -206,14 +189,9 @@ def run(scalar_1, scalar_2, scalar_2_encoder, scalar_1_encoder,bits_scalar_1, bi
 
         #####################################################
 
-        scalar_1_encoder.encodeIntoArray(linha[0], bits_scalar_1)
-        scalar_2_encoder.encodeIntoArray(linha[1], bits_scalar_2)
+        scalar_1_encoder.encodeIntoArray(linha, bits_scalar_1)
 
-
-
-        encoder_output = np.concatenate((bits_scalar_1, bits_scalar_2))
-
-        print(encoder_output)
+        encoder_output = bits_scalar_1
 
         ####################################################
 
@@ -241,9 +219,9 @@ def run(scalar_1, scalar_2, scalar_2_encoder, scalar_1_encoder,bits_scalar_1, bi
     
     if save == True:
         
-        a= 'anomalies/2_anom_score' + str_1 + '_.txt'
+        a= 'anomalies/1_anom_score' + str_1 + '_.txt'
 
-        b = 'anomalies/2_anom_logscore' + str_2 + '_.txt'
+        b = 'anomalies/1_anom_logscore' + str_2 + '_.txt'
 
         np.savetxt(a,anom_score_txt,delimiter=',')
 
@@ -273,15 +251,16 @@ def plot(date, scalar):
 
     plt.show()
 
+
 if __name__ == '__main__':
     
     N_COLUMNS = 2048
 
     sign = np.load("./signs/sign.npy") ##abrindo os sinais
 
-    scalar_1, scalar_2, N_DATA = tratar_dados(sign,a=7000000,b=7003000)
+    scalar_1, N_DATA = tratar_dados(sign,a=7000000,b=7003000)
 
-    SIZE_ENCODER_, scalar_2_encoder, scalar_1_encoder, bits_scalar_1, bits_scalar_2 = definir_encoders()
+    SIZE_ENCODER_, scalar_1_encoder, bits_scalar_1= definir_encoders()
 
     sp = definir_SP(SIZE_ENCODER_)
 
@@ -289,11 +268,16 @@ if __name__ == '__main__':
     
     anomaly_score, anomaly_likelihood, anom_score_txt, anom_logscore_txt = definir_AnomDetect(N_DATA)
 
-    run(scalar_1, scalar_2, scalar_2_encoder, scalar_1_encoder, bits_scalar_1, bits_scalar_2,sp,tm,N_COLUMNS, anom_score_txt, anom_logscore_txt,'','',True,True,True)
+    run(scalar_1, scalar_1_encoder, bits_scalar_1,sp,tm,N_COLUMNS, anom_score_txt, anom_logscore_txt,'','',True,True,True)
     
     #date1, scalar1, N_DATA1 = tratar_dados(sign,a = 7220000, b = 7221000)
 
     #run(date1,scalar1,scalar_encoder,time_encoder,bits_time, bits_scalar,sp,tm,N_COLUMNS, anom_score_txt, anom_logscore_txt,'ver2','ver2',False,False,True)
     
     #plot(date,scalar)
+
+
+
+
+
 
