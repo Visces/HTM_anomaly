@@ -7,7 +7,7 @@ sign = np.load("./signs/sign.npy")
 anomaly_logscore = np.genfromtxt('anomalies/1_anom_logscore_.txt', delimiter=',')
 
 #######################ERRO ARTIFICIAL ################################
-sign[7001500:7001550,1] = [250 for i in sign[7001500:7001550,1]]
+#sign[7001500:7001550,1] = [250 for i in sign[7001500:7001550,1]]
 #######################################################################
 
 #plt.plot(sign[:,0],sign[:,1])
@@ -17,14 +17,14 @@ fig, ax1 = plt.subplots()
 color = 'tab:orange'
 ax1.set_xlabel('time(s)')
 ax1.set_ylabel('frequency(Hz)',color = color)
-ax1.plot(sign[7000000:7003000,0],sign[7000000:7003000,1],color = color)
+ax1.plot(sign[7000000:7010000,0],sign[7000000:7010000,1],color = color)
 ax1.tick_params(axis='y', labelcolor = color)
 
 ax2 = ax1.twinx()
 
 color ='tab:blue'
 ax2.set_ylabel('anom_score')
-ax2.plot(sign[7000000:7003000,0], anomaly_logscore[:-1],color = color)
+ax2.plot(sign[7000000:7010000,0], anomaly_logscore[:-1],color = color)
 ax2.tick_params(axis='y', labelcolor=color)
 
 fig.tight_layout()

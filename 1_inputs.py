@@ -31,9 +31,9 @@ def tratar_dados(dados, a = 7000000, b =7001000 ):
     """
 
     ############################ ERRO ARTIFICIAL #########################################
-    if b>7001700: ## apenas testando a TM ao inserir erros
+    #if b>7001700: ## apenas testando a TM ao inserir erros
 
-        sign[7001500:7001550,1] = [250 for i in sign[7001500:7001550,1]]
+    #    sign[7001500:7001550,1] = [250 for i in sign[7001500:7001550,1]]
     #######################################################################################
     scalar_1 = sign[a:b,1]
     N_DATA = np.size(scalar_1)
@@ -47,7 +47,7 @@ def definir_encoders():
     """  
     ###  A RESOLUCAO DOS 3 TINHA QUE SER 2.30 # TROCAR DEPOIS
     
-    scalar_1_encoder = RandomDistributedScalarEncoder(resolution = 1.5384615384615385,
+    scalar_1_encoder = RandomDistributedScalarEncoder(resolution = 5.0,
                                                     seed = 42,
                                                     )
 
@@ -216,12 +216,9 @@ def run(scalar_1,scalar_1_encoder, bits_scalar_1, sp, tm, N_COLUMNS, anom_score_
 
         if i%100==0:
 
-            print(i)
             print('\n')
-            print(linha)
-            print('\n')
-            print(encoder_output)
-        
+            print('The program is at the {i}th datapoint'.format(i=i))
+            
         if i==1520:
             print(anom_probability_txt[i])
     
@@ -271,7 +268,7 @@ if __name__ == '__main__':
 
     sign = np.load("./signs/sign.npy") ##abrindo os sinais
 
-    scalar_1, N_DATA = tratar_dados(sign,a=7000000,b=7003000)
+    scalar_1, N_DATA = tratar_dados(sign,a=7000000,b=7010000)
 
     SIZE_ENCODER_, scalar_1_encoder, bits_scalar_1= definir_encoders()
 
