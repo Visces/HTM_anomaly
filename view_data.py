@@ -4,10 +4,10 @@ import datetime
 import os
 #a=7000000,b=7008000
 sign = np.load("./signs/sign.npy")
-anomaly_logscore = np.genfromtxt('anomalies/1_anom_logscore_.txt', delimiter=',')
+anomaly_logscore = np.genfromtxt('anomalies/1_anom_score_.txt', delimiter=',')
 
 #######################ERRO ARTIFICIAL ################################
-#sign[7001500:7001550,1] = [250 for i in sign[7001500:7001550,1]]
+sign[7001500:7001550,1] = [i+10 for i in sign[7001500:7001550,1]]
 #######################################################################
 
 #plt.plot(sign[:,0],sign[:,1])

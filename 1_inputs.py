@@ -48,7 +48,7 @@ def definir_encoders():
     """  
     ###  A RESOLUCAO DOS 3 TINHA QUE SER 2.30 # TROCAR DEPOIS
     
-    scalar_1_encoder = RandomDistributedScalarEncoder(resolution = 5.0,
+    scalar_1_encoder = RandomDistributedScalarEncoder(resolution = 1.5384615384615385,
                                                     seed = 42,
                                                     )
 
@@ -174,9 +174,9 @@ def definir_AnomDetect(N_DATA):
     anom_logscore_txt = np.zeros((N_DATA+1,))
     anom_probability_txt = np.zeros((N_DATA+1,))
 
-    anomaly_score = Anomaly(slidingWindowSize=25)
+    anomaly_score = Anomaly()
 
-    anomaly_likelihood = AnomalyLikelihood(learningPeriod=600, historicWindowSize=313)
+    anomaly_likelihood = AnomalyLikelihood(learningPeriod=600, historicWindowSize=500)
 
 
     return anomaly_score, anomaly_likelihood, anom_score_txt, anom_logscore_txt, anom_probability_txt
