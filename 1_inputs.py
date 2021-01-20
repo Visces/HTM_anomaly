@@ -22,6 +22,7 @@ import time
 #scalar virou scalar_2
 #NÃO RODAMOS GETSCALARMETRICWITHTIMEOFDAYPARAMS EM NENHUM DOS DADOS
 
+NUM_ACTIVE_COLUMNS = 40
 
 
 def tratar_dados(dados, a = 7000000, b =7001000 ):
@@ -31,9 +32,9 @@ def tratar_dados(dados, a = 7000000, b =7001000 ):
     """
 
     ############################ ERRO ARTIFICIAL #########################################
-    #if b>7001700: ## apenas testando a TM ao inserir erros
+    if b>7001700: ## apenas testando a TM ao inserir erros
 
-    #    sign[7001500:7001550,1] = [250 for i in sign[7001500:7001550,1]]
+        sign[7001500:7001550,1] = [i+10 for i in sign[7001500:7001550,1]]
     #######################################################################################
     scalar_1 = sign[a:b,1]
     N_DATA = np.size(scalar_1)
@@ -85,7 +86,7 @@ def definir_SP(SIZE_ENCODER_):
         globalInhibition = True,  # means that the winning columns are selected in the neighborhood, though in this code...
         #we're dealing as if all the columns are neigbhors with one another
         localAreaDensity = -1.0,
-        numActiveColumnsPerInhArea = 40,
+        numActiveColumnsPerInhArea = NUM_ACTIVE_COLUMNS,
         stimulusThreshold = 0,
         ##Well, if we set the number of active columns per input, than there is no need to set an stimulusThreshold
         ##First = because the simulusTHreshold will be already set as the sum of permanences of the 40th column...@@NEED TO CHECK
@@ -207,7 +208,16 @@ def run(scalar_1,scalar_1_encoder, bits_scalar_1, sp, tm, N_COLUMNS, anom_score_
 
         ####################################################
 
-        anom_score_txt[i] = anomaly_score.compute(tm.getActiveCells(), tm.getPredictiveCells())
+        predictive_columns = np.zeros(NUM_ACTIVE_COLUMNS)
+
+        predictive_columns = [tm.columnForCell(cell) for cell in tm.getPredictiveCells()] ## list of mini-columns which have a...
+        ## predictive cell. They predict the SP SDR in the time t+1.
+
+
+
+        ####################################################
+
+        anom_score_txt[i] = anomaly_score.compute(active_columns, predictive_columns)
 
         anom_probability_txt[i] = anomaly_likelihood.anomalyProbability(linha,anom_score_txt[i])
 
@@ -268,7 +278,7 @@ if __name__ == '__main__':
 
     sign = np.load("./signs/sign.npy") ##abrindo os sinais
 
-    scalar_1, N_DATA = tratar_dados(sign,a=7000000,b=7010000)
+    scalar_1, N_DATA = tratar_dados(sign,a=7000000,b=7003000)
 
     SIZE_ENCODER_, scalar_1_encoder, bits_scalar_1= definir_encoders()
 
