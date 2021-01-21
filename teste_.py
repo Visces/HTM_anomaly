@@ -19,8 +19,8 @@ import os
 import time
 
 t = getScalarMetricWithTimeOfDayAnomalyParams(  metricData = [0],
-                                                minVal = -100.0,
-                                                maxVal = 100.0,
+                                                minVal = -10.0,
+                                                maxVal = 10.0,
                                                 tmImplementation = "cpp"    )
 
 
