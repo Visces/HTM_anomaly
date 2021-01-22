@@ -17,8 +17,8 @@ anomaly_logscore = np.genfromtxt('anomalies/1_anom_logscore_.txt', delimiter=','
 
 ####################### INTERVALO ANALISADO ##############################
 
-a = 8000
-b = 16000
+a=7160000
+b=7180000
 
 ##########################################################################
 

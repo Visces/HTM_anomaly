@@ -32,7 +32,7 @@ def tratar_dados(dados, a = 7000000, b =7001000 ):
     """
 
     ############################ ERRO ARTIFICIAL #########################################
-    if b>7001700: ## apenas testando a TM ao inserir erros
+    if b>7001700 and a < 7001000: ## apenas testando a TM ao inserir erros
 
         sign[7001500:7001550,1] = [i+10 for i in sign[7001500:7001550,1]]
     #######################################################################################
@@ -48,7 +48,7 @@ def definir_encoders():
     """  
     ###  A RESOLUCAO DOS 3 TINHA QUE SER 2.30 # TROCAR DEPOIS
     
-    scalar_1_encoder = RandomDistributedScalarEncoder(resolution = 1.5384615384615385,
+    scalar_1_encoder = RandomDistributedScalarEncoder(resolution = 0.4,
                                                     seed = 42,
                                                     )
 
@@ -187,8 +187,8 @@ def run(scalar_1,scalar_1_encoder, bits_scalar_1, sp, tm, N_COLUMNS, anom_score_
     dados = scalar_1
     
     for i,linha in enumerate(dados):
-
         
+        t0 = time.clock()
 
         #####################################################
 
@@ -223,11 +223,11 @@ def run(scalar_1,scalar_1_encoder, bits_scalar_1, sp, tm, N_COLUMNS, anom_score_
 
         anom_logscore_txt[i] = anomaly_likelihood.computeLogLikelihood(anom_probability_txt[i])
 
-
-        if i%100==0:
+        t1 = time.clock()-t0
+        if (i-99)%100==0:
 
             print('\n')
-            print('The program is at the {i}th datapoint'.format(i=i))
+            print('The program ran trough [{b}:{i}] datapoints in {t1} seconds!'.format(b=i+1-100,i=i+1, t1=t1))
             
         if i==1520:
             print(anom_probability_txt[i])
@@ -278,7 +278,7 @@ if __name__ == '__main__':
 
     sign = np.load("./signs/sign.npy") ##abrindo os sinais
 
-    scalar_1, N_DATA = tratar_dados(sign,a=7000000,b=7003000)
+    scalar_1, N_DATA = tratar_dados(sign,a=7160000,b=7180000)
 
     SIZE_ENCODER_, scalar_1_encoder, bits_scalar_1= definir_encoders()
 
