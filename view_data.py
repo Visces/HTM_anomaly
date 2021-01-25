@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import datetime 
 import os
+from sklearn.preprocessing import StandardScaler
 
 #########################CARREGANDO OS DADOS##############################
 
@@ -18,7 +19,15 @@ anomaly_logscore = np.genfromtxt('anomalies/1_anom_logscore_.txt', delimiter=','
 ####################### INTERVALO ANALISADO ##############################
 
 a=7160000
-b=7180000
+b=7162000
+
+##########################################################################
+
+####################### STANDARDIZE ###################################
+
+standardize = StandardScaler()
+sign[:,1:] = standardize.fit_transform(sign[:,1:])
+
 
 ##########################################################################
 

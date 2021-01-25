@@ -15,6 +15,8 @@ import numpy as np
 import pandas as pd
 import os
 import time
+from sklearn.preprocessing import StandardScaler
+
 
 
 ##obs:
@@ -22,10 +24,8 @@ import time
 #scalar virou scalar_2
 #NÃO RODAMOS GETSCALARMETRICWITHTIMEOFDAYPARAMS EM NENHUM DOS DADOS
 
-NUM_ACTIVE_COLUMNS = 40
 
-
-def tratar_dados(dados, a = 7000000, b =7001000 ):
+def tratar_dados(dados, a = 7000000, b =7001000, standardize = False ):
 
     """
     retorna o scalar_1 e o N_DATA
@@ -36,8 +36,19 @@ def tratar_dados(dados, a = 7000000, b =7001000 ):
 
         sign[7001500:7001550,1] = [i+10 for i in sign[7001500:7001550,1]]
     #######################################################################################
+    if standardize==True:
+        
+        standardize = StandardScaler()
+        print("o max antes da padronizacao eh: {i}".format(i=np.max(dados[a:b,1])))
+        sign = standardize.fit_transform(dados)
+        print("o max depois da padronizacao eh: {i}".format(i=np.max(sign[a:b,1])))
+
+    
     scalar_1 = sign[a:b,1]
     N_DATA = np.size(scalar_1)
+
+    print(scalar_1)
+    print("o max depois da padronizacao eh: {i}".format(i=np.max(scalar_1)))
     
     return scalar_1, N_DATA
 
@@ -48,7 +59,7 @@ def definir_encoders():
     """  
     ###  A RESOLUCAO DOS 3 TINHA QUE SER 2.30 # TROCAR DEPOIS
     
-    scalar_1_encoder = RandomDistributedScalarEncoder(resolution = 0.4,
+    scalar_1_encoder = RandomDistributedScalarEncoder(resolution = 0.1,
                                                     seed = 42,
                                                     )
 
@@ -176,7 +187,7 @@ def definir_AnomDetect(N_DATA):
 
     anomaly_score = Anomaly()
 
-    anomaly_likelihood = AnomalyLikelihood(learningPeriod=600, historicWindowSize=500)
+    anomaly_likelihood = AnomalyLikelihood(learningPeriod=800, historicWindowSize=500)
 
 
     return anomaly_score, anomaly_likelihood, anom_score_txt, anom_logscore_txt, anom_probability_txt
@@ -274,11 +285,18 @@ def plot(date, scalar):
 
 if __name__ == '__main__':
     
+
+    ################## SP AND TM params ########################
+    NUM_ACTIVE_COLUMNS = 40
+
     N_COLUMNS = 2048
+    
+    ############################################################
+
 
     sign = np.load("./signs/sign.npy") ##abrindo os sinais
 
-    scalar_1, N_DATA = tratar_dados(sign,a=7160000,b=7180000)
+    scalar_1, N_DATA = tratar_dados(sign,a=7160000,b=7162000, standardize=True)
 
     SIZE_ENCODER_, scalar_1_encoder, bits_scalar_1= definir_encoders()
 
@@ -290,11 +308,6 @@ if __name__ == '__main__':
 
     run(scalar_1, scalar_1_encoder, bits_scalar_1,sp,tm,N_COLUMNS, anom_score_txt, anom_logscore_txt,anom_probability_txt,'','',True,True,True)
     
-    #date1, scalar1, N_DATA1 = tratar_dados(sign,a = 7220000, b = 7221000)
-
-    #run(date1,scalar1,scalar_encoder,time_encoder,bits_time, bits_scalar,sp,tm,N_COLUMNS, anom_score_txt, anom_logscore_txt,'ver2','ver2',False,False,True)
-    
-    #plot(date,scalar)
 
 
 
