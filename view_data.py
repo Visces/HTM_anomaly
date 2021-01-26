@@ -3,6 +3,7 @@ import numpy as np
 import datetime 
 import os
 from sklearn.preprocessing import StandardScaler
+import copy
 
 
 def open_data(a,b, standardize = False):
@@ -112,8 +113,47 @@ def plot_(a, b, dados_dict, standardize_ = False, error = False):
     plt.show()
 
 def plot_whole(dados_dict):
+    """
+    Plot the whole dataset.
+    """
     plt.plot(dados_dict['sign'][:,0], dados_dict['sign'][:,1], color = 'black')
     plt.show()
+
+def plot_aggregate(a,b,dict_):
+    """
+    Plot the data and the "aggregated" data, i.e plotting 1 every 2 and 1 every 3 records. 
+    """
+
+
+    dados_dict = dict_
+    sign_2 = copy.deepcopy(dados_dict['sign'][:,1])
+    sign_2 = [sign_2[i] if i%2==0 else float("NaN") for i in range(np.size(sign_2))] ## pick only 1 every 2 inputs. 
+
+    fig, axs = plt.subplots(2)
+    axs[0].set_ylabel('x - standard')
+    axs[0].set_title('data plot')
+    axs[0].plot( dados_dict['sign'][a:b,0],  dados_dict['sign'][a:b,1],'*', color = 'black')
+
+    axs[1].set_ylabel('x - 1 in 2')
+    axs[1].set_title('gabarito')
+    axs[1].plot( dados_dict['sign'][a:b,0],  sign_2[a:b],'*', color = 'blue')
+
+
+    sign_3 = copy.deepcopy(dados_dict['sign'][:,1])
+    sign_3 = [sign_3[i] if i%3==0 else float("NaN") for i in range(np.size(sign_3))]
+
+    fig, axs = plt.subplots(2)
+    axs[0].set_ylabel('x - standard')
+    axs[0].set_title('data plot')
+    axs[0].plot( dados_dict['sign'][a:b,0],  dados_dict['sign'][a:b,1], color = 'black')
+
+    axs[1].set_ylabel('x - 1 in 3')
+    axs[1].set_title('gabarito')
+    axs[1].plot( dados_dict['sign'][a:b,0],  sign_3[a:b], color = 'blue')
+
+
+    plt.show()
+
 
 
 def main():
@@ -126,8 +166,12 @@ def main():
     ##########################################################################
     
     data_ = open_data(a,b, True)
-    plot_(a, b, data_,True, False)
-    plot_whole(data_)
+    #plot_(a, b, data_,True, False)
+    #plot_whole(data_)
+
+    ########################## PLOT AGGREGATION ###############################
+    plot_aggregate(0,14000000,data_)
+
 
 
 if __name__ == "__main__":
