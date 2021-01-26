@@ -59,7 +59,7 @@ def definir_encoders():
     """  
     ###  A RESOLUCAO DOS 3 TINHA QUE SER 2.30 # TROCAR DEPOIS
     
-    scalar_1_encoder = RandomDistributedScalarEncoder(resolution = 0.1,
+    scalar_1_encoder = RandomDistributedScalarEncoder(resolution = 0.07692307692307693,
                                                     seed = 42,
                                                     )
 
@@ -196,10 +196,14 @@ def run(scalar_1,scalar_1_encoder, bits_scalar_1, sp, tm, N_COLUMNS, anom_score_
 
 
     dados = scalar_1
-    
+
+    ta = time.clock() # calculate the beginning time of the function
+
     for i,linha in enumerate(dados):
-        
-        t0 = time.clock()
+
+        if i == 0:
+
+            t0 = time.clock()
 
         #####################################################
 
@@ -234,15 +238,21 @@ def run(scalar_1,scalar_1_encoder, bits_scalar_1, sp, tm, N_COLUMNS, anom_score_
 
         anom_logscore_txt[i] = anomaly_likelihood.computeLogLikelihood(anom_probability_txt[i])
 
-        t1 = time.clock()-t0
+
         if (i-99)%100==0:
 
             print('\n')
+
+            t1 = time.clock()-t0
+
             print('The program ran trough [{b}:{i}] datapoints in {t1} seconds!'.format(b=i+1-100,i=i+1, t1=t1))
-            
-        if i==1520:
-            print(anom_probability_txt[i])
-    
+
+            t0 = time.clock()
+
+
+    tb = time.clock()
+    print("the HTM model ran trough {size} in {tb} seconds".format(size = np.size(scalar_1), tb = tb-ta))
+
     if save == True:
         
         a= 'anomalies/1_anom_score' + str_1 + '_.txt'
@@ -287,6 +297,7 @@ if __name__ == '__main__':
     
 
     ################## SP AND TM params ########################
+
     NUM_ACTIVE_COLUMNS = 40
 
     N_COLUMNS = 2048
@@ -296,7 +307,7 @@ if __name__ == '__main__':
 
     sign = np.load("./signs/sign.npy") ##abrindo os sinais
 
-    scalar_1, N_DATA = tratar_dados(sign,a=7160000,b=7162000, standardize=True)
+    scalar_1, N_DATA = tratar_dados(sign,a=7145000,b=7180000, standardize=True)
 
     SIZE_ENCODER_, scalar_1_encoder, bits_scalar_1= definir_encoders()
 
@@ -308,8 +319,6 @@ if __name__ == '__main__':
 
     run(scalar_1, scalar_1_encoder, bits_scalar_1,sp,tm,N_COLUMNS, anom_score_txt, anom_logscore_txt,anom_probability_txt,'','',True,True,True)
     
-
-
 
 
 
