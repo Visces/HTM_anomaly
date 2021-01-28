@@ -16,6 +16,7 @@ import pandas as pd
 import os
 import time
 from sklearn.preprocessing import StandardScaler
+import copy
 
 
 
@@ -25,17 +26,12 @@ from sklearn.preprocessing import StandardScaler
 #NÃO RODAMOS GETSCALARMETRICWITHTIMEOFDAYPARAMS EM NENHUM DOS DADOS
 
 
-def tratar_dados(dados, a = 7000000, b =7001000, standardize = False ):
+def tratar_dados(dados, a = 7000000, b =7001000, standardize = False, erro = False ):
 
     """
     retorna o scalar_1 e o N_DATA
     """
 
-    ############################ ERRO ARTIFICIAL #########################################
-    if b>7001700 and a < 7001000: ## apenas testando a TM ao inserir erros
-
-        sign[7001500:7001550,1] = [i+10 for i in sign[7001500:7001550,1]]
-    #######################################################################################
     if standardize==True:
         
         standardize = StandardScaler()
@@ -43,11 +39,23 @@ def tratar_dados(dados, a = 7000000, b =7001000, standardize = False ):
         sign = standardize.fit_transform(dados)
         print("o max depois da padronizacao eh: {i}".format(i=np.max(sign[a:b,1])))
 
+
+    ############################ ERRO ARTIFICIAL #########################################
+
+    if erro == True and b-a >= 6000: ## apenas testando a TM ao inserir erros
+
+        a_aux = a + 4500
+        b_aux = a + 4550
+
+
+        sign[a_aux:b_aux,1] = [value*3.2 for value in sign[a_aux:b_aux,1]]
+
+        print(sign[a_aux-20:b_aux+20,1])
+
     
     scalar_1 = sign[a:b,1]
     N_DATA = np.size(scalar_1)
 
-    print(scalar_1)
     print("o max depois da padronizacao eh: {i}".format(i=np.max(scalar_1)))
     
     return scalar_1, N_DATA
@@ -307,7 +315,7 @@ if __name__ == '__main__':
 
     sign = np.load("./signs/sign.npy") ##abrindo os sinais
 
-    scalar_1, N_DATA = tratar_dados(sign,a=7145000,b=7180000, standardize=True)
+    scalar_1, N_DATA = tratar_dados(sign,a=7160000,b=7200000, standardize=True, erro = True)
 
     SIZE_ENCODER_, scalar_1_encoder, bits_scalar_1= definir_encoders()
 
