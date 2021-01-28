@@ -26,7 +26,7 @@ import copy
 #NÃO RODAMOS GETSCALARMETRICWITHTIMEOFDAYPARAMS EM NENHUM DOS DADOS
 
 
-def tratar_dados(dados, a = 7000000, b =7001000, standardize = False, erro = False ):
+def tratar_dados(dados, a = 7000000, b =7001000, standardize = False, aggregate = False, n = 3, erro = False ):
 
     """
     retorna o scalar_1 e o N_DATA
@@ -54,11 +54,21 @@ def tratar_dados(dados, a = 7000000, b =7001000, standardize = False, erro = Fal
 
     
     scalar_1 = sign[a:b,1]
+
+    if aggregate == True:
+        scalar_1 = aggregate_f(scalar_1, n)
+
     N_DATA = np.size(scalar_1)
 
-    print("o max depois da padronizacao eh: {i}".format(i=np.max(scalar_1)))
+    print("o max depois da padronizacao e junção eh: {i}".format(i=np.max(scalar_1)))
     
     return scalar_1, N_DATA
+
+def aggregate_f(vector_data, n):
+    vect = []
+    vect= [vector_data[t] for t in range(np.size(vector_data)) if t%n==0]
+    return vect
+
 
 def definir_encoders():
     
@@ -315,7 +325,7 @@ if __name__ == '__main__':
 
     sign = np.load("./signs/sign.npy") ##abrindo os sinais
 
-    scalar_1, N_DATA = tratar_dados(sign,a=7160000,b=7200000, standardize=True, erro = True)
+    scalar_1, N_DATA = tratar_dados(sign,a=7160000,b=7200000, standardize=True, aggregate = True, n = 2, erro = True)
 
     SIZE_ENCODER_, scalar_1_encoder, bits_scalar_1= definir_encoders()
 
