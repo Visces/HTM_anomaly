@@ -47,13 +47,19 @@ def standardization(dict):
     print(dict['sign'][:,1:])
 
 
-def artificial_error(dict_):
+def artificial_error(dict_, a , b):
     """
     Inserts an artificial error, must be aplied before the standardization.
     """
 
-    if b>70015550 and b-a > 20000:
-        dict_['sign'][7001500:7001550,1] = [i+10 for i in dict_['sign'][7001500:7001550,1]]
+    if b-a >= 6000: ## apenas testando a TM ao inserir erros
+
+        a_aux = a + 4500
+        b_aux = a + 4550
+
+
+        dict_['sign'][a_aux:b_aux,1] = [value*3.2 for value in dict_['sign'][a_aux:b_aux,1]]
+
 
 
 def plot_(a, b, dados_dict, standardize_ = False, error = False):
@@ -62,7 +68,7 @@ def plot_(a, b, dados_dict, standardize_ = False, error = False):
     Plot the signal, 'gabarito', anomaly score, likelihood and loglikelihood.
     """
     if error == True:
-        artificial_error(dados_dict)
+        artificial_error(dados_dict, a, b)
     
     if standardize_ == True:
         standardization(dados_dict)
@@ -160,17 +166,17 @@ def main():
 
     ############################ PLOT RANGE ##################################
 
-    a=7145000
+    a=7160000
     b=7180000
 
     ##########################################################################
     
     data_ = open_data(a,b, True)
     #plot_(a, b, data_,True, False)
-    #plot_whole(data_)
+    plot_aggregate(a, b, data_)
 
     ########################## PLOT AGGREGATION ###############################
-    plot_aggregate(0,14000000,data_)
+    #plot_aggregate(0,14000000,data_)
 
 
 
